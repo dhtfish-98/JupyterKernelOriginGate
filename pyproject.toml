@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "jupyter-kernel-origin-gate"
-version = "0.1.0"
+version = "0.1.1"
 description = "Origin-bound authorization for a single-user Jupyter kernel API"
 requires-python = ">=3.11"
 license = "MIT"

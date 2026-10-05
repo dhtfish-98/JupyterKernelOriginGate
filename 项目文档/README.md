@@ -1,6 +1,8 @@
 # JupyterKernelOriginGate
 
-Version 0.1.0. Author of the new policy and validation code: **dhtfish98**.
+Version 0.1.1. Author of the new policy and validation code: **dhtfish98**.
+
+Version 0.1.1 updates release metadata only; the authorization policy and live-kernel behavior are unchanged from 0.1.0. The published 0.1.0 release remains a historical artifact.
 
 This is a narrow, single-user Jupyter Server authorizer for a headless kernel API. Jupyter authenticates the request first. The added policy then requires one configured HTTP(S) `Origin` and an exact `Authorization: Bearer` token on kernel REST requests and the kernel WebSocket. It refuses query-token and cookie-only access to that API. Other Jupyter resources, including sessions and terminals, are denied by the authorizer. This is defense in depth for a deployment that deliberately wants a single authorized origin and explicit API credentials.
 
