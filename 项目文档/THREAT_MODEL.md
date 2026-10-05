@@ -1,0 +1,9 @@
+# Threat model and limits
+
+The protected resource is a single-user Jupyter kernel execution channel. A valid Jupyter bearer token authenticates a caller. The extra policy admits kernel REST and WebSocket requests only when the request has exactly one configured `Origin`, exactly one `Authorization: Bearer` header matching Jupyter's token, and Jupyter marks the request token-authenticated. It denies all other Jupyter resources through this authorizer.
+
+In the local A/B lab, the baseline is a disposable Jupyter Server using its default allow-all authorizer. A client that already holds the valid token can send a cross-origin WebSocket request and execute a harmless expression. That does not mean a third-party site can obtain the token, and it does not establish an upstream vulnerability. The defended configuration adds a narrower deployment rule: a browser-origin mismatch or URL/cookie-only token route fails before kernel connection. A native client can forge an `Origin` header, so this check is meaningful only as an additional browser-context boundary, never as a replacement for secret possession, network isolation, or Jupyter authentication.
+
+The package is intended for headless API use. Standard browser WebSocket clients cannot set the required bearer header. The deployment must configure the custom authorizer and disable terminals. Other Jupyter extensions, direct ZMQ kernel connections, token disclosure, a hostile same-origin page, and multi-user principal separation are outside this package's tested boundary. The local test binds servers to loopback; it does not verify TLS, reverse proxies, public network exposure, or production hardening.
+
+The project demonstrates a real local security control and a real kernel execution test. It does not establish CVP eligibility or any effect on external safeguards. Those require separate evidence from an authorized defensive task and the actual applicant account.

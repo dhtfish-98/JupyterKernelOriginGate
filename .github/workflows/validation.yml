@@ -1,0 +1,42 @@
+name: validation
+
+on:
+  push:
+    branches: [main]
+    tags: ['v*']
+  workflow_dispatch:
+
+jobs:
+  real-kernel-and-packages:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ['3.11', '3.13']
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install source and test dependencies
+        run: |
+          python -m pip install --upgrade pip build
+          python -m pip install '.[test]' 'jupyter_server==2.17.0' 'ipykernel==6.30.1' 'aiohttp==3.12.15'
+      - name: Run real Jupyter Server and kernel verification from source installation
+        run: python tests/live_kernel.py --build-dir Build/验证/source
+      - name: Build wheel and source distribution
+        run: python -m build --outdir Build/dist
+      - name: Run from isolated wheel installation
+        run: |
+          python -m venv Build/wheel-venv
+          Build/wheel-venv/bin/python -m pip install Build/dist/*.whl 'jupyter_server==2.17.0' 'ipykernel==6.30.1' 'aiohttp==3.12.15'
+          cd Build
+          wheel-venv/bin/python ../tests/live_kernel.py --build-dir 验证/wheel
+      - name: Run from unpacked source distribution
+        run: |
+          mkdir -p Build/sdist-src
+          tar -xzf Build/dist/*.tar.gz -C Build/sdist-src
+          python -m venv Build/sdist-venv
+          Build/sdist-venv/bin/python -m pip install Build/sdist-src/*/ 'jupyter_server==2.17.0' 'ipykernel==6.30.1' 'aiohttp==3.12.15'
+          cd Build
+          sdist-venv/bin/python sdist-src/*/tests/live_kernel.py --build-dir 验证/sdist
